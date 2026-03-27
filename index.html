@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kick-off AI-program Fredriksborg — Videocation</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --light-grey: #F7F7F7;
+  --mid-grey: #EDEDED;
+  --grey: #C2C2C2;
+  --dark: #4D4554;
+  --text: #333333;
+  --white: #FFFFFF;
+  --yellow: #FFE880;
+  --teal: #3D7A80;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text);
+  background: var(--dark);
+}
+
+/* Canvas for particles */
+canvas#particles {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Deck */
+.deck {
+  position: relative;
+  width: 100%; height: 100%;
+  z-index: 1;
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Backgrounds */
+.bg-light { background: var(--light-grey); }
+.bg-white { background: var(--white); }
+.bg-mid { background: var(--mid-grey); }
+.bg-dark { background: var(--dark); color: var(--white); }
+.bg-gradient-dark {
+  background: linear-gradient(135deg, var(--dark) 0%, #6B5F75 100%);
+  color: var(--white);
+}
+
+/* Typography */
+.slide h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.slide h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+
+.slide h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.slide p, .slide li {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  font-weight: 400;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+
+.accent { color: var(--teal); }
+.highlight {
+  background: var(--yellow);
+  padding: 2px 10px;
+  display: inline;
+}
+
+.small { font-size: 0.85rem; opacity: 0.7; }
+
+/* Animations for child elements */
+.slide.active .anim {
+  animation: fadeUp 0.6s ease forwards;
+}
+.slide.active .anim-d1 { animation-delay: 0.1s; }
+.slide.active .anim-d2 { animation-delay: 0.2s; }
+.slide.active .anim-d3 { animation-delay: 0.3s; }
+.slide.active .anim-d4 { animation-delay: 0.4s; }
+.slide.active .anim-d5 { animation-delay: 0.5s; }
+.slide.active .anim-d6 { animation-delay: 0.6s; }
+
+.anim {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards / Grids */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  transition: transform 0.3s ease;
+}
+
+.card:hover { transform: translateY(-4px); }
+
+.card-dark {
+  background: var(--dark);
+  color: var(--white);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+}
+
+.card-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--text);
+  font-weight: 800;
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+
+/* Stat cards */
+.stat-number {
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: var(--teal);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.bg-dark .stat-number { color: var(--yellow); }
+
+/* Expert circles */
+.expert-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  max-width: 1000px;
+}
+
+.expert {
+  text-align: center;
+}
+
+.expert-avatar {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: var(--grey);
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: var(--white);
+  border: 3px solid var(--mid-grey);
+}
+
+.expert-name { font-weight: 700; font-size: 0.9rem; }
+.expert-role { font-size: 0.75rem; opacity: 0.7; margin-top: 2px; }
+
+/* Category pills */
+.pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 700px;
+  justify-content: center;
+}
+
+.pill {
+  background: var(--yellow);
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  width: 100%;
+  max-width: 1000px;
+  position: relative;
+  padding-top: 20px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 85px;
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: var(--mid-grey);
+}
+
+.timeline-item {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--yellow);
+  margin: 0 auto 16px;
+  border: 3px solid var(--dark);
+}
+
+.timeline-avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--grey);
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: 3px solid var(--mid-grey);
+}
+
+.timeline-name { font-weight: 700; font-size: 0.9rem; }
+.timeline-course { font-size: 0.78rem; opacity: 0.8; margin: 4px 0; }
+.timeline-date {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin-top: 12px;
+}
+.timeline-label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* Table */
+.activity-table {
+  width: 100%;
+  max-width: 1000px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.activity-table thead th {
+  background: var(--dark);
+  color: var(--white);
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.activity-table thead th:first-child { border-radius: 8px 0 0 0; }
+.activity-table thead th:last-child { border-radius: 0 8px 0 0; }
+
+.activity-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--mid-grey);
+}
+
+.activity-table tbody tr:nth-child(even) { background: var(--light-grey); }
+
+/* Evaluation list */
+.eval-list {
+  list-style: none;
+  max-width: 800px;
+  width: 100%;
+}
+
+.eval-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--mid-grey);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.eval-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--yellow);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Formula row */
+.formula {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.formula-box {
+  flex: 1;
+  border-radius: 16px;
+  padding: 28px 20px;
+  text-align: center;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.formula-op {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--text);
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed;
+  bottom: 0; left: 0;
+  height: 4px;
+  background: var(--yellow);
+  z-index: 100;
+  transition: width 0.4s ease;
+}
+
+/* Slide counter */
+.slide-counter {
+  position: fixed;
+  bottom: 16px; right: 24px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  z-index: 100;
+  font-weight: 500;
+}
+
+/* Nav hint */
+.nav-hint {
+  position: fixed;
+  bottom: 16px; left: 24px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  z-index: 100;
+}
+
+/* Two-column layout */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  width: 100%;
+  max-width: 1100px;
+  align-items: center;
+}
+
+.two-col-text { text-align: left; }
+
+/* Expectations */
+.expect-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  max-width: 1000px;
+  width: 100%;
+}
+
+.expect-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+}
+
+.expect-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+/* Goal cards */
+.goal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  max-width: 1000px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.goal-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 28px 20px;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.goal-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+/* Deepdive grid */
+.deepdive-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  max-width: 1000px;
+}
+
+.deepdive-card {
+  text-align: center;
+  background: var(--white);
+  border-radius: 14px;
+  padding: 24px 14px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+}
+
+.deepdive-avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--grey);
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: 3px solid var(--mid-grey);
+}
+
+.deepdive-name { font-weight: 700; font-size: 0.85rem; }
+.deepdive-course { font-size: 0.72rem; color: var(--teal); margin: 6px 0 4px; font-weight: 500; }
+.deepdive-time { font-size: 0.8rem; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div class="deck">
+
+  <!-- SLIDE 1: Title -->
+  <div class="slide bg-dark active" id="slide-1">
+    <p class="subtitle anim anim-d1" style="font-size:0.9rem; text-transform:uppercase; letter-spacing:3px; opacity:0.6;">Videocation</p>
+    <h1 class="anim anim-d2" style="font-size:3.4rem; max-width:800px; text-align:center;">Kick-off AI-program<br><span style="color:var(--yellow);">Fredriksborg</span></h1>
+    <p class="subtitle anim anim-d3" style="margin-top:8px;">Det du trenger for å utvikle mennesker og din virksomhet.</p>
+    <p class="anim anim-d4" style="margin-top:32px; font-size:0.95rem; opacity:0.6;">07.04.2026</p>
+  </div>
+
+  <!-- SLIDE 2: Videocation utvikler mennesker og organisasjon -->
+  <div class="slide bg-white" id="slide-2">
+    <h1 class="anim anim-d1" style="max-width:900px; text-align:center;">Videocation utvikler <span class="accent">mennesker</span> og <span class="accent">organisasjon</span></h1>
+    <div class="grid-2 anim anim-d2" style="margin-top:32px;">
+      <div style="text-align:left;">
+        <p style="margin-bottom:16px;"><strong>Portal med over 250+ kurs</strong> laget av Norges ledende eksperter.</p>
+        <p style="margin-bottom:16px;">Vi har alle <strong>kategoriene en bedrift trenger</strong> for å lykkes: digitale verktøy, ledelse, bærekraft, HMS, salg og kundebehandling, m.m.</p>
+        <p style="margin-bottom:16px;">Kursene er rundt en time og er <strong>brutt ned i korte effektive leksjoner</strong>.</p>
+        <p style="margin-bottom:16px;">Hvert kurs avsluttes med en <strong>flervalgstest</strong>. Om deltagerne består testen, mottar de et kursbevis.</p>
+        <p>Tilgang til eget <strong>administratorverktøy</strong> med seerstatistikk for ansatte.</p>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:center;">
+        <div style="background:var(--dark); border-radius:16px; padding:32px; color:var(--white); text-align:center; width:100%;">
+          <p style="font-size:3rem; font-weight:900;">250+</p>
+          <p style="font-weight:600; margin-top:4px;">videokurs</p>
+          <p style="font-size:0.85rem; opacity:0.7; margin-top:8px;">100+ fageksperter</p>
+          <p style="font-size:0.85rem; opacity:0.7;">4,7 &#9733; brukertilfredshet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Produkter og tjenester -->
+  <div class="slide bg-light" id="slide-3">
+    <h1 class="anim anim-d1" style="text-align:center;">Videocation <span class="accent">produkter og tjenester</span></h1>
+    <p class="subtitle anim anim-d2" style="text-align:center; max-width:750px;">Gjennom et helhetlig samarbeid bistår vi med plattform, innhold, metode, og ressurser for å lykkes med strategisk læring</p>
+    <div class="grid-3 anim anim-d3" style="margin-top:28px;">
+      <div class="card">
+        <div class="card-number">1</div>
+        <h3>Læring med Norges beste eksperter</h3>
+        <p style="font-size:0.9rem; opacity:0.8;">250+ videokurs innen alle viktige kompetanseområder for næringslivet</p>
+      </div>
+      <div class="card">
+        <div class="card-number">2</div>
+        <h3>Akademi, integrasjon og produksjon</h3>
+        <p style="font-size:0.9rem; opacity:0.8;">Skreddersydde læringsløsninger og integrasjon med eksisterende systemer</p>
+      </div>
+      <div class="card">
+        <div class="card-number">3</div>
+        <h3>Innsikt, rådgivning og kompetanseprogram</h3>
+        <p style="font-size:0.9rem; opacity:0.8;">Strukturerte program som setter læringen i system og skaper varig endring</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Eksperter -->
+  <div class="slide bg-white" id="slide-4">
+    <h1 class="anim anim-d1" style="text-align:center;">De fremste innen sine <span class="accent">fagområder</span></h1>
+    <div class="expert-grid anim anim-d2" style="margin-top:28px;">
+      <div class="expert">
+        <div class="expert-avatar">CH</div>
+        <p class="expert-name">Camilla Hager</p>
+        <p class="expert-role">AI, tekst</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">HR</div>
+        <p class="expert-name">Haakon Rydning</p>
+        <p class="expert-role">Selvledelse</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">IS</div>
+        <p class="expert-name">Inga Strümke</p>
+        <p class="expert-role">Innføring og risiko ved kunstig intelligens</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">KK</div>
+        <p class="expert-name">Kristine Kotte-Eriksen</p>
+        <p class="expert-role">Kjønnsbalanse, mangfold og sosial bærekraft</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">SS</div>
+        <p class="expert-name">Saher Sourouri</p>
+        <p class="expert-role">Super selvdisiplin</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">PA</div>
+        <p class="expert-name">Per Anfindsen</p>
+        <p class="expert-role">Salg, gjennomslagskraft, retorikk</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">VH</div>
+        <p class="expert-name">Vivi-Ann Hilde</p>
+        <p class="expert-role">Ledelse, ny som leder, forhandlingsteknikk</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">CC</div>
+        <p class="expert-name">Christine Calvert</p>
+        <p class="expert-role">Kommunikasjon, salg og førsteinntrykk</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">JP</div>
+        <p class="expert-name">Jon-Gunnar Pettersen</p>
+        <p class="expert-role">Microsoft Office, Excel, Teams, Word</p>
+      </div>
+      <div class="expert">
+        <div class="expert-avatar">KE</div>
+        <p class="expert-name">Karine Einang</p>
+        <p class="expert-role">HMS, ledelse, beredskap</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Kompetanseområder -->
+  <div class="slide bg-light" id="slide-5">
+    <h1 class="anim anim-d1" style="text-align:center; max-width:800px;">Hundrevis av kurs i viktige <span class="accent">kompetanseområder</span></h1>
+    <div class="pill-grid anim anim-d2" style="margin-top:32px;">
+      <span class="pill">Bærekraft og ESG</span>
+      <span class="pill">Teknologi og datasikkerhet</span>
+      <span class="pill">Selvledelse</span>
+      <span class="pill">Ledelse og strategi</span>
+      <span class="pill">Sykefraværshåndtering</span>
+      <span class="pill">Digitale arbeidsverktøy</span>
+      <span class="pill">Mangfold og inkludering</span>
+      <span class="pill">HMS, lover og regelverk</span>
+      <span class="pill">Tekst og skrivearbeid</span>
+      <span class="pill">Innovasjon</span>
+      <span class="pill">Kommunikasjon</span>
+      <span class="pill">Agile metoder og Lean</span>
+      <span class="pill">Produktledelse og OKRs</span>
+      <span class="pill">Organisasjonsutvikling</span>
+      <span class="pill">Kundebehandling og salg</span>
+      <span class="pill">Økonomi og finans</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Kompetanseprogram setter læringen i system -->
+  <div class="slide bg-dark" id="slide-6">
+    <h1 class="anim anim-d1" style="text-align:center; font-size:2.8rem;">Kompetanseprogram:<br><span style="color:var(--yellow);">Setter læringen i system</span></h1>
+    <p class="subtitle anim anim-d2" style="max-width:600px; text-align:center; margin-top:16px;">Strukturerte læringsløp som kombinerer digitale kurs med fysiske samlinger for varig kompetanseheving</p>
+  </div>
+
+  <!-- SLIDE 7: 80% statistikk -->
+  <div class="slide bg-light" id="slide-7">
+    <div class="anim anim-d1" style="text-align:center; max-width:800px;">
+      <h1 style="font-size:2.8rem; line-height:1.2;"><span class="highlight">80% av bedriftsopplæring</span> fører aldri til endring i jobbadferd</h1>
+      <p style="font-size:1.3rem; margin-top:24px; opacity:0.7;">...og bare 12% fører til målbart bedre forretningsresultater</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Hvordan utvikle nye ferdigheter -->
+  <div class="slide bg-white" id="slide-8">
+    <p class="anim anim-d1 small" style="text-transform:uppercase; letter-spacing:2px; font-weight:600; color:var(--teal);">Læring er en endringsprosess</p>
+    <h1 class="anim anim-d2" style="text-align:center;">Hvordan utvikle nye ferdigheter</h1>
+    <div class="formula anim anim-d3" style="margin-top:36px;">
+      <div class="formula-box" style="background:var(--mid-grey);">
+        <p style="font-size:0.85rem; font-weight:600; margin-bottom:4px;">VIDEOCATION</p>
+        <p style="font-size:0.8rem; opacity:0.8;">Tilpasset og tilgjengelig <strong>innhold</strong> for innføring av teori</p>
+      </div>
+      <span class="formula-op">&times;</span>
+      <div class="formula-box" style="background:var(--yellow);">
+        <h3 style="margin-bottom:4px;">Prosess</h3>
+        <p style="font-size:0.8rem;">med refleksjon, trening og overførsel til arbeidsoppgaver</p>
+      </div>
+      <span class="formula-op">=</span>
+      <div class="formula-box" style="background:var(--teal); color:var(--white);">
+        <h3 style="margin-bottom:4px; color:var(--white);">Atferds&shy;endring</h3>
+        <p style="font-size:0.8rem; opacity:0.9;">(over tid)</p>
+      </div>
+    </div>
+    <p class="anim anim-d4 small" style="margin-top:24px; max-width:600px; text-align:center;">Nøkkelen til læring er <strong>repetisjon</strong> og trening av nye ferdigheter</p>
+  </div>
+
+  <!-- SLIDE 9: Blandet læring gir effekt -->
+  <div class="slide bg-white" id="slide-9">
+    <h1 class="anim anim-d1" style="text-align:center;">Blandet læring gir <span class="accent">effekt</span></h1>
+    <div class="grid-3 anim anim-d2" style="margin-top:36px;">
+      <div class="card" style="text-align:left;">
+        <p class="stat-number">21%</p>
+        <p style="font-weight:700;">høyere læringsutbytte</p>
+        <p class="small" style="margin-top:6px;">sammenlignet med tradisjonell opplæring</p>
+      </div>
+      <div class="card" style="text-align:left;">
+        <p class="stat-number">30-50%</p>
+        <p style="font-weight:700;">reduksjon i opplæringskostnader</p>
+        <p class="small" style="margin-top:6px;">gjennom redusert undervisningstid og økt skalerbarhet</p>
+      </div>
+      <div class="card" style="text-align:left;">
+        <p class="stat-number">50-60%</p>
+        <p style="font-weight:700;">høyere gjennomføringsrate</p>
+        <p class="small" style="margin-top:6px;">sammenlignet med rene e-læringsprogrammer</p>
+      </div>
+    </div>
+    <p class="anim anim-d3 small" style="margin-top:24px;">Kilder: Fauta et al., Hillard, Association for Talent Development</p>
+  </div>
+
+  <!-- SLIDE 10: Introduksjon til programmet -->
+  <div class="slide bg-light" id="slide-10">
+    <h1 class="anim anim-d1" style="text-align:center;">Introduksjon til programmet</h1>
+    <div class="two-col anim anim-d2" style="margin-top:28px;">
+      <div class="two-col-text">
+        <h2 style="font-size:1.8rem;">Kræsjkurs i AI</h2>
+        <p style="margin-bottom:16px;">I dette programmet skal vi lære metoder og verktøy for å utnytte kunstig intelligens og effektivisere arbeidsprosesser.</p>
+        <p>Programmet skal gjennomføres i april og mai. Forberedelse gjøres digitalt og kombineres med felles refleksjonssamlinger og øvelser.</p>
+      </div>
+      <div style="background:var(--dark); border-radius:16px; padding:40px; color:var(--white); text-align:center;">
+        <p style="font-size:4rem;">&#129302;</p>
+        <p style="font-weight:700; font-size:1.1rem; margin-top:12px;">AI-program</p>
+        <p style="font-size:0.9rem; opacity:0.7; margin-top:8px;">April – Mai 2026</p>
+        <p style="font-size:0.9rem; opacity:0.7;">Digitalt + fysisk</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: Mål med programmet -->
+  <div class="slide bg-gradient-dark" id="slide-11">
+    <p class="anim anim-d1" style="text-transform:uppercase; letter-spacing:2px; font-size:0.85rem; color:var(--yellow); font-weight:600;">Kræsjkurs i AI</p>
+    <h1 class="anim anim-d2" style="text-align:center; max-width:800px;">Målet med programmet er å styrke AI-kompetansen i Fredriksborg</h1>
+    <div class="goal-grid anim anim-d3" style="margin-top:32px;">
+      <div class="goal-card">
+        <div class="goal-icon">&#9989;</div>
+        <h3 style="color:var(--text);">Mestre AI-verktøy</h3>
+        <p style="font-size:0.85rem; color:var(--text); opacity:0.8;">Lære å bruke Copilot og ChatGPT for å effektivisere arbeidshverdagen</p>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">&#128640;</div>
+        <h3 style="color:var(--text);">Effektivisere produksjonen</h3>
+        <p style="font-size:0.85rem; color:var(--text); opacity:0.8;">Få konkrete verktøy for å produsere mer effektivt i alt fra e-poster til analyser</p>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">&#128483;</div>
+        <h3 style="color:var(--text);">Bygge AI-kultur</h3>
+        <p style="font-size:0.85rem; color:var(--text); opacity:0.8;">Når alle kommer i gang blir det lettere å dele kunnskap og inspirere hverandre</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: Øk produktiviteten med AI - Timeline -->
+  <div class="slide bg-white" id="slide-12">
+    <p class="anim anim-d1" style="text-transform:uppercase; letter-spacing:2px; font-size:0.85rem; color:var(--yellow); font-weight:600; background:var(--dark); padding:4px 14px; border-radius:4px;">Kompetanseprogram</p>
+    <h1 class="anim anim-d2" style="text-align:center; margin-top:12px;">Øk produktiviteten med AI</h1>
+    <div class="timeline anim anim-d3" style="margin-top:36px;">
+      <div class="timeline-item">
+        <div class="timeline-avatar">CH</div>
+        <p class="timeline-name">Camilla Hager</p>
+        <p class="timeline-course">Kom i gang med AI<br>spar tid og skriv bedre (57 min)</p>
+        <div class="timeline-dot" style="margin-top:12px;"></div>
+        <p class="timeline-date">7. april</p>
+        <p class="timeline-label">&#128640; Kick off!</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-avatar">JP</div>
+        <p class="timeline-name">Jon-Gunnar Pettersen</p>
+        <p class="timeline-course">Slik bruker du Microsoft Copilot<br>i Officepakken (34 min)</p>
+        <div class="timeline-dot" style="margin-top:12px;"></div>
+        <p class="timeline-date">5. mai</p>
+        <p class="timeline-label">Felles samling<br><strong>Fysisk i Fredrikstad</strong></p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-avatar">CH</div>
+        <p class="timeline-name">Camilla Hager</p>
+        <p class="timeline-course">Smart bruk av<br>AI-assistenter (56 min)</p>
+        <div class="timeline-dot" style="margin-top:12px;"></div>
+        <p class="timeline-date">26. mai</p>
+        <p class="timeline-label">Felles samling<br><strong>Digital samling</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 13: Oversikt aktiviteter -->
+  <div class="slide bg-light" id="slide-13">
+    <h1 class="anim anim-d1" style="text-align:left; width:100%; max-width:1000px;">Oversikt aktiviteter</h1>
+    <div style="width:3rem; height:4px; background:var(--yellow); margin-bottom:24px; border-radius:2px;" class="anim anim-d1"></div>
+    <table class="activity-table anim anim-d2">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Beskrivelse</th>
+          <th>Start</th>
+          <th>Slutt</th>
+          <th>Kurs/link</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Teams</strong></td>
+          <td>Kick-off</td>
+          <td>07.04.2026</td>
+          <td>07.04.2026</td>
+          <td>Møtelink</td>
+        </tr>
+        <tr>
+          <td><strong>Kurs</strong></td>
+          <td><em>Digitalt kurs 1:</em> Kom i gang med AI – spar tid og skriv bedre</td>
+          <td>07.04.2026</td>
+          <td>05.05.2026</td>
+          <td style="color:var(--teal); font-weight:600;">Kurslink</td>
+        </tr>
+        <tr>
+          <td><strong>Kurs</strong></td>
+          <td><em>Digitalt kurs 2:</em> Slik bruker du Microsoft Copilot i Officepakken</td>
+          <td>07.04.2026</td>
+          <td>05.05.2026</td>
+          <td style="color:var(--teal); font-weight:600;">Kurslink</td>
+        </tr>
+        <tr>
+          <td><strong>Fysisk samling</strong></td>
+          <td>Felles samling: Refleksjon og praktiske gruppeoppgaver</td>
+          <td>05.05.2026</td>
+          <td>05.05.2026</td>
+          <td>Fysisk samling</td>
+        </tr>
+        <tr>
+          <td><strong>Kurs</strong></td>
+          <td><em>Digitalt kurs 3:</em> Smart bruk av AI-assistenter</td>
+          <td>05.05.2026</td>
+          <td>26.05.2026</td>
+          <td style="color:var(--teal); font-weight:600;">Kurslink</td>
+        </tr>
+        <tr>
+          <td><strong>Teams</strong></td>
+          <td>Avsluttende digital samling: med refleksjon og praktiske gruppeoppgaver</td>
+          <td>26.05.2026</td>
+          <td>26.05.2026</td>
+          <td>Møtelink</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SLIDE 14: Fordypning for de ekstra nysgjerrige -->
+  <div class="slide bg-white" id="slide-14">
+    <p class="anim anim-d1" style="text-transform:uppercase; letter-spacing:2px; font-size:0.85rem; color:var(--yellow); font-weight:600; background:var(--dark); padding:4px 14px; border-radius:4px;">Kompetanseprogram</p>
+    <h1 class="anim anim-d2" style="text-align:center; margin-top:12px;">Fordypning for de <span class="accent">ekstra nysgjerrige</span></h1>
+    <div class="deepdive-grid anim anim-d3" style="margin-top:28px;">
+      <div class="deepdive-card">
+        <div class="deepdive-avatar">IS</div>
+        <p class="deepdive-name">Inga Strümke</p>
+        <p class="deepdive-course">En innføring i kunstig intelligens og maskinlæring</p>
+        <p class="deepdive-time">90 min</p>
+      </div>
+      <div class="deepdive-card">
+        <div class="deepdive-avatar">JV</div>
+        <p class="deepdive-name">Joachim Viktil</p>
+        <p class="deepdive-course">Bli mer konkurransedyktig med kunstig intelligens</p>
+        <p class="deepdive-time">36 min</p>
+      </div>
+      <div class="deepdive-card">
+        <div class="deepdive-avatar">HO</div>
+        <p class="deepdive-name">Håkon Olsen</p>
+        <p class="deepdive-course">Risikoanalyse av KI-systemer</p>
+        <p class="deepdive-time">21 min</p>
+      </div>
+      <div class="deepdive-card">
+        <div class="deepdive-avatar">MJ</div>
+        <p class="deepdive-name">Magnus Johansson</p>
+        <p class="deepdive-course">Google Gemini – Googles KI-assistent</p>
+        <p class="deepdive-time">68 min</p>
+      </div>
+      <div class="deepdive-card">
+        <div class="deepdive-avatar">IS</div>
+        <p class="deepdive-name">Inga Strümke</p>
+        <p class="deepdive-course">Kort om metoder i KI forklart av Inga Strümke</p>
+        <p class="deepdive-time">45 min</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 15: Forventninger til deltakerne -->
+  <div class="slide bg-light" id="slide-15">
+    <h1 class="anim anim-d1" style="text-align:center;">Forventninger til <span class="accent">deltakerne</span></h1>
+    <div class="expect-grid anim anim-d2" style="margin-top:32px;">
+      <div class="expect-card">
+        <div class="card-number">1</div>
+        <div class="expect-icon">&#127891;</div>
+        <h3>Se kurs på Videocation</h3>
+        <p style="font-size:0.85rem; opacity:0.8;">Se de utvalgte kursene på Videocation slik at alle løftes opp på samme nivå.</p>
+      </div>
+      <div class="expect-card">
+        <div class="card-number">2</div>
+        <div class="expect-icon">&#129309;</div>
+        <h3>Delta på felles samling</h3>
+        <p style="font-size:0.85rem; opacity:0.8;">Møt forberedt til workshopene hvor det arbeides med konkrete verktøy fra kurset.</p>
+      </div>
+      <div class="expect-card">
+        <div class="card-number">3</div>
+        <div class="expect-icon">&#128170;</div>
+        <h3>Bruk læringen og repeter</h3>
+        <p style="font-size:0.85rem; opacity:0.8;">Bruk det du har lært i arbeidshverdagen. Frisk opp og fordyp deg på kompetanseområdet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 16: Egenevaluering -->
+  <div class="slide bg-white" id="slide-16">
+    <h1 class="anim anim-d1" style="text-align:center;">Egenevaluering <span class="accent">før program</span></h1>
+    <p class="anim anim-d2" style="margin-bottom:28px;"><span class="highlight" style="font-weight:700;">5 korte spørsmål &gt; 3 minutter</span></p>
+    <ul class="eval-list anim anim-d3">
+      <li>
+        <span class="eval-number">1</span>
+        <span>Hvordan vurderer du din nåværende kompetanse innen AI-verktøy og kunstig intelligens?</span>
+      </li>
+      <li>
+        <span class="eval-number">2</span>
+        <span>I hvilken grad føler du deg trygg på å bruke ulike AI-verktøy i jobben?</span>
+      </li>
+      <li>
+        <span class="eval-number">3</span>
+        <span>Hvor ofte bruker du AI-verktøy som Copilot, ChatGPT eller lignende i arbeidshverdagen din?</span>
+      </li>
+      <li>
+        <span class="eval-number">4</span>
+        <span>I hvilken grad bruker du AI-verktøy for å effektivisere arbeidsoppgaver som skriving, analyse eller problemløsning?</span>
+      </li>
+      <li>
+        <span class="eval-number">5</span>
+        <span>Hvor godt kjenner du til beste praksis for å skrive effektive instruksjoner (prompts) til AI-verktøy?</span>
+      </li>
+    </ul>
+    <p class="anim anim-d4" style="margin-top:24px;"><span class="highlight" style="font-weight:600;">Evalueringen er anonym</span></p>
+  </div>
+
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progress"></div>
+
+<!-- Counter -->
+<div class="slide-counter" id="counter">1 / 16</div>
+
+<!-- Nav hint -->
+<div class="nav-hint">&larr; &rarr; for å navigere</div>
+
+<script>
+// Particles
+(function(){
+  const c = document.getElementById('particles');
+  const ctx = c.getContext('2d');
+  let particles = [];
+
+  function resize(){
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  for(let i = 0; i < 40; i++){
+    particles.push({
+      x: Math.random() * c.width,
+      y: Math.random() * c.height,
+      r: Math.random() * 2 + 0.5,
+      dx: (Math.random() - 0.5) * 0.4,
+      dy: (Math.random() - 0.5) * 0.4,
+      o: Math.random() * 0.4 + 0.1
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, c.width, c.height);
+    particles.forEach(function(p){
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,232,128,' + p.o + ')';
+      ctx.fill();
+      p.x += p.dx;
+      p.y += p.dy;
+      if(p.x < 0 || p.x > c.width) p.dx *= -1;
+      if(p.y < 0 || p.y > c.height) p.dy *= -1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Slide navigation
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var current = 0;
+  var progress = document.getElementById('progress');
+  var counter = document.getElementById('counter');
+
+  function go(n){
+    if(n < 0 || n >= total) return;
+    slides[current].classList.remove('active');
+    // Reset animations
+    slides[current].querySelectorAll('.anim').forEach(function(el){
+      el.style.animation = 'none';
+      el.offsetHeight;
+      el.style.animation = '';
+    });
+    current = n;
+    slides[current].classList.add('active');
+    progress.style.width = ((current + 1) / total * 100) + '%';
+    counter.textContent = (current + 1) + ' / ' + total;
+    window.location.hash = current + 1;
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' '){
+      e.preventDefault();
+      go(current + 1);
+    }
+    if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){
+      e.preventDefault();
+      go(current - 1);
+    }
+  });
+
+  // Touch support
+  var touchStartX = 0;
+  document.addEventListener('touchstart', function(e){ touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', function(e){
+    var diff = touchStartX - e.changedTouches[0].clientX;
+    if(Math.abs(diff) > 50){
+      if(diff > 0) go(current + 1);
+      else go(current - 1);
+    }
+  });
+
+  // Click navigation
+  document.addEventListener('click', function(e){
+    if(e.clientX > window.innerWidth / 2) go(current + 1);
+    else go(current - 1);
+  });
+
+  // Hash navigation
+  var hash = parseInt(window.location.hash.replace('#',''));
+  if(hash && hash > 0 && hash <= total){
+    go(hash - 1);
+  }
+
+  go(0);
+})();
+</script>
+</body>
+</html>
